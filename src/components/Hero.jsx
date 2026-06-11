@@ -1,4 +1,48 @@
 import React, { useEffect, useRef } from 'react';
+import { motion } from 'framer-motion';
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.12,
+      delayChildren: 0.15,
+    },
+  },
+};
+
+const fadeUpVariants = {
+  hidden: { opacity: 0, y: 28 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] },
+  },
+};
+
+const fadeLeftVariants = {
+  hidden: { opacity: 0, x: -24 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
+  },
+};
+
+const profileVariants = {
+  hidden: { opacity: 0, x: 40, scale: 0.92 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    scale: 1,
+    transition: {
+      duration: 0.9,
+      ease: [0.22, 1, 0.36, 1],
+      delay: 0.35,
+    },
+  },
+};
 
 export default function Hero() {
   const canvasRef = useRef(null);
@@ -12,17 +56,15 @@ export default function Hero() {
     let width = (canvas.width = canvas.offsetWidth);
     let height = (canvas.height = canvas.offsetHeight);
 
-    // Particles representing fluid elements
     const particles = [];
     const particleCount = 150;
     const colors = [
-      'rgba(0, 245, 255, 0.45)', // Vivid Cyan
-      'rgba(0, 180, 216, 0.35)',  // Mid Cyan
-      'rgba(148, 163, 184, 0.4)', // Silver
-      'rgba(244, 246, 249, 0.3)'   // White-silver
+      'rgba(0, 245, 255, 0.45)',
+      'rgba(0, 180, 216, 0.35)',
+      'rgba(148, 163, 184, 0.4)',
+      'rgba(244, 246, 249, 0.3)',
     ];
 
-    // Initialize particles
     for (let i = 0; i < particleCount; i++) {
       particles.push({
         x: Math.random() * width,
@@ -33,7 +75,7 @@ export default function Hero() {
         color: colors[Math.floor(Math.random() * colors.length)],
         amplitude: Math.random() * 15 + 5,
         frequency: Math.random() * 0.005 + 0.002,
-        phase: Math.random() * Math.PI * 2
+        phase: Math.random() * Math.PI * 2,
       });
     }
 
@@ -46,19 +88,15 @@ export default function Hero() {
 
     let time = 0;
 
-    // Simulation loop
     const render = () => {
       ctx.clearRect(0, 0, width, height);
 
-      // Draw mathematical grid lines / vector arrows in background
       ctx.strokeStyle = 'rgba(0, 180, 216, 0.04)';
       ctx.lineWidth = 1;
       const gridSize = 40;
-      
-      // Draw velocity vector arrows behind particles
+
       for (let x = 0; x < width; x += gridSize * 2) {
         for (let y = 0; y < height; y += gridSize * 2) {
-          // Calculate vector direction based on sine wave (pulsating stream)
           const angle = Math.sin(x * 0.003 + time * 0.02) * 0.2;
           ctx.beginPath();
           ctx.moveTo(x, y);
@@ -69,24 +107,19 @@ export default function Hero() {
 
       time += 1;
 
-      // Draw and update fluid particles
       particles.forEach((p) => {
         ctx.fillStyle = p.color;
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
         ctx.fill();
 
-        // Pulsating stream CFD mathematics: flow moves horizontally, waves oscillate vertically
         p.x += p.speedX;
-        
-        // Vertical movement is governed by a pulsating sine function (modeling pulsating microchannel streams)
-        const pulsation = Math.sin(time * 0.01) * 1.5; // time-based pulsation intensity
+
+        const pulsation = Math.sin(time * 0.01) * 1.5;
         p.y = p.y + Math.sin(p.x * p.frequency + p.phase + time * 0.015) * 0.6 * pulsation;
 
-        // Bending around a virtual channel boundary / center core obstruction
         const centerDistance = Math.abs(p.y - height / 2);
         if (p.x > width * 0.4 && p.x < width * 0.6 && centerDistance < 60) {
-          // Push particles outwards to mimic fluid flow bypassing a solid cylinder
           if (p.y < height / 2) {
             p.y -= 2;
           } else {
@@ -94,14 +127,12 @@ export default function Hero() {
           }
         }
 
-        // Boundary checks: reset particles when they exit the right side of the channel
         if (p.x > width) {
           p.x = 0;
           p.y = Math.random() * height;
           p.speedX = Math.random() * 2 + 1;
         }
 
-        // Wrap around top/bottom bounds
         if (p.y < 0) p.y = height;
         if (p.y > height) p.y = 0;
       });
@@ -123,13 +154,12 @@ export default function Hero() {
     if (timelineSection) {
       window.scrollTo({
         top: timelineSection.offsetTop - 80,
-        behavior: 'smooth'
+        behavior: 'smooth',
       });
     }
   };
 
   const handleDownloadCV = () => {
-    // Generates a dynamic print view or alerts the user
     window.print();
   };
 
@@ -140,24 +170,34 @@ export default function Hero() {
       </div>
 
       <div className="container hero-container">
-        <div className="hero-content">
-          <div className="hero-badge">
+        <motion.div
+          className="hero-content"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          <motion.div className="hero-badge" variants={fadeLeftVariants}>
             <span className="badge-dot"></span>
             <span>GOVERNMENT ASSISTANT ENGINEER • RHD BANGLADESH</span>
-          </div>
+          </motion.div>
 
-          <h1 className="hero-title">
+          <motion.h1 className="hero-title" variants={fadeUpVariants}>
             Taufiq Hasan
-            <span className="hero-subtitle">Engineering Infrastructure & System Operations</span>
-          </h1>
+            <motion.span
+              className="hero-subtitle"
+              variants={fadeUpVariants}
+            >
+              Engineering Infrastructure & System Operations
+            </motion.span>
+          </motion.h1>
 
-          <p className="hero-desc">
-            Assistant Engineer at the <span className="highlight">Roads and Highways Division of Bangladesh</span>. 
-            BUET Mechanical Engineer with a specialized background in Gas Infrastructure regulation, 
+          <motion.p className="hero-desc" variants={fadeUpVariants}>
+            Assistant Engineer at the <span className="highlight">Roads and Highways Division of Bangladesh</span>.
+            BUET Mechanical Engineer with a specialized background in Gas Infrastructure regulation,
             thermodynamics, and Computational Fluid Dynamics (CFD).
-          </p>
+          </motion.p>
 
-          <div className="hero-actions">
+          <motion.div className="hero-actions" variants={fadeUpVariants}>
             <a href="#evolution" onClick={handleScrollToCareer} className="btn btn-primary">
               <span>Explore My Career Journey</span>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -173,38 +213,64 @@ export default function Hero() {
               </svg>
               <span>Download CV / Print Resume</span>
             </button>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
-        {/* CAD Schematic Overlay on Hero side */}
-        <div className="hero-schematic">
-          <div className="schematic-border">
-            <div className="schematic-grid"></div>
-            <div className="schematic-crosshairs"></div>
-            <div className="schematic-metrics">
-              <div className="metric-line"><span className="metric-label">SYS.STATUS:</span> <span className="metric-val text-accent">NOMINAL</span></div>
-              <div className="metric-line"><span className="metric-label">LOC:</span> <span className="metric-val">DHAKA, BD</span></div>
-              <div className="metric-line"><span className="metric-label">FLOW_RATE:</span> <span className="metric-val">0.38 m/s</span></div>
-              <div className="metric-line"><span className="metric-label">GRID_LOAD:</span> <span className="metric-val">100%</span></div>
+        <motion.div
+          className="hero-profile"
+          variants={profileVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          <motion.div
+            className="hero-profile-frame"
+            animate={{ y: [0, -8, 0] }}
+            transition={{
+              duration: 5,
+              repeat: Infinity,
+              ease: 'easeInOut',
+            }}
+          >
+            <div className="hero-profile-ring hero-profile-ring--outer" aria-hidden="true" />
+            <div className="hero-profile-ring hero-profile-ring--inner" aria-hidden="true" />
+
+            <div className="hero-profile-image-wrap">
+              <img
+                src="/profile.png"
+                alt="Taufiq Hasan — Assistant Engineer"
+                className="hero-profile-image"
+                width={320}
+                height={380}
+              />
+              <div className="hero-profile-overlay" aria-hidden="true" />
             </div>
-            
-            {/* Draw a technical heat exchanger isometric line drawing inside the schematic card */}
-            <svg className="schematic-vector" viewBox="0 0 120 120" fill="none" stroke="rgba(0, 180, 216, 0.4)" strokeWidth="0.8">
-              <rect x="10" y="40" width="100" height="40" rx="3" strokeWidth="1" />
-              <line x1="25" y1="40" x2="25" y2="80" strokeDasharray="2,2" />
-              <line x1="45" y1="40" x2="45" y2="80" strokeDasharray="2,2" />
-              <line x1="65" y1="40" x2="65" y2="80" strokeDasharray="2,2" />
-              <line x1="85" y1="40" x2="85" y2="80" strokeDasharray="2,2" />
-              <path d="M5,50 H10" />
-              <path d="M110,70 H115" />
-              <circle cx="5" cy="50" r="1.5" fill="rgba(0, 180, 216, 0.6)" />
-              <circle cx="115" cy="70" r="1.5" fill="rgba(0, 180, 216, 0.6)" />
-              {/* Pulsating mixing stream indicator inside the CAD box */}
-              <path d="M10,60 Q35,50 60,60 T110,60" stroke="rgba(0, 245, 255, 0.6)" strokeWidth="1" strokeDasharray="3,3" />
-            </svg>
-            <div className="schematic-compass"></div>
-          </div>
-        </div>
+
+            <div className="hero-profile-corners" aria-hidden="true">
+              <span /><span /><span /><span />
+            </div>
+
+            <div className="hero-profile-badge">
+              <span className="badge-dot"></span>
+              <span>ACTIVE • BUET ME</span>
+            </div>
+          </motion.div>
+
+          <motion.div
+            className="hero-profile-meta"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.85, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <div className="hero-profile-meta-line">
+              <span className="metric-label">ROLE</span>
+              <span className="metric-val text-accent">Asst. Engineer</span>
+            </div>
+            <div className="hero-profile-meta-line">
+              <span className="metric-label">LOC</span>
+              <span className="metric-val">Dhaka, BD</span>
+            </div>
+          </motion.div>
+        </motion.div>
       </div>
     </section>
   );
